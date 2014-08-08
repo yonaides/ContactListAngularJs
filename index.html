@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <!-- This file has been downloaded from Bootsnipp.com. Enjoy! -->
+    <title>Contact List - Bootsnipp.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/font-awesome.css" rel="stylesheet">
+    <link href="styles/style.css" rel="stylesheet">
+
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="container" ng-controller="contactCtrl">
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading c-list">
+                    <span class="title">Contacts</span>
+                    <ul class="pull-right c-controls">
+                        <li><a href="#cant-do-all-the-work-for-you" data-toggle="tooltip" data-placement="top"
+                               title="Add Contact"><i class="glyphicon glyphicon-plus"></i></a></li>
+                        <li><a href="#" class="hide-search" data-command="toggle-search" data-toggle="tooltip"
+                               data-placement="top" title="Toggle Search"><i class="fa fa-ellipsis-v"></i></a></li>
+                    </ul>
+                </div>
+
+                <div class="row" style="display: none;">
+                    <div class="col-xs-12">
+                        <div class="input-group c-search">
+                            <input type="text" class="form-control" id="contact-list-search" ng-model="searchContact">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><span
+                                        class="glyphicon glyphicon-search text-muted"></span></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <ul class="list-group" id="contact-list">
+
+                    <li class="list-group-item" ng-repeat="contact in Contactos | filter : searchContact ">
+                        <div class="col-xs-12 col-sm-3">
+                            <img ng-src={{contact.imagen}} alt={{contact.name}} class="img-responsive img-circle"/>
+                        </div>
+                        <div class="col-xs-12 col-sm-9">
+                            <span class="name">{{ contact.name }}</span><br/>
+                            <span class="glyphicon glyphicon-map-marker c-info" title={{contact.mapmarker}}></span>
+                            <span>{{ contact.mapmarker }}</span><br/>
+                            <span class="glyphicon glyphicon-earphone c-info " title={{contact.earphone}}></span>
+                            <span>{{contact.earphone}}<br/></span>
+                            <span class="fa fa-comments c-info" title={{contact.comments}}></span>
+                            <span>{{ contact.comments }}<br/></span>
+                        </div>
+                        <div class="clearfix"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="cant-do-all-the-work-for-you" class="modal fade bs-example-modal-md" tabindex="-1" role="dialog"
+         aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-hidden="true">Close
+                    </button>
+                    <h4 class="modal-title" id="mySmallModalLabel">Crear Contacto</h4>
+                </div>
+                <div class="modal-body">
+
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="name">Nombre</label>
+                            <input type="text" class="form-control" id="name" placeholder="Nombre"
+                                   ng-model="contact.name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mapMarker">Map</label>
+                            <input type="text" class="form-control" id="mapMarker" placeholder="Map Marker"
+                                   ng-model="contact.mapmaker">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="PhoneNumber">Phone Number</label>
+                            <input type="text" class="form-control" id="PhoneNumber" placeholder="Phone Number"
+                                   ng-model="contact.phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Email"
+                                   ng-model="contact.email">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="imgNumber">Img Number</label>
+                            <input type="number" class="form-control" min="40" max="70" step="1" size="6" id="imgNumber"
+                                   ng-model="img" >
+                        </div>
+
+                        <div class="form-group">
+                            <legend>Gender *</legend>
+                            <input type="radio" name="gender" value="male" id="male" ng-model="male" ng-checked="male">
+                            <label for="male">Male</label>
+                            <input type="radio" name="gender" value="female" id="female"  ng-model="female">
+                            <label for="female">Female</label>
+
+                        </div>
+
+                        <button class="btn btn-success" ng-click="addContacto(contact)">Guardar</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScrip Search Plugin
+    <script src="scripts/jquery.searchable-1.0.0.min.js"></script> -->
+    <script src="scripts/script.js"></script>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+
+    <script src="app/app.js"></script>
+    <script src="app/resources/contactResource.js"></script>
+    <script src="app/controllers/contactCtrl.js"></script>
+
+
+</div>
+
+</body>
+</html>
