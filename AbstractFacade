@@ -19,12 +19,6 @@ import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.LoggerFactory;
 
-/**
- * Esta clase fue creada para manejar los procesos de insertar, consultar,
- * salvar/editar y borrar de las entidades de la base de datos
- *
- * @param <T> clase entidad que será manejada.
- */
 public abstract class AbstractFacade<T> {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); // log para manejar excepciones en el servidor
