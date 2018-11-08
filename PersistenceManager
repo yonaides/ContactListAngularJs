@@ -1,0 +1,66 @@
+/*
+ *  Nombre del archivo: PersistenceManager.java
+ *  Fecha creación: 03/08/2018
+ *  Analista Desarrollador: Yonaides Tavares - acap2033
+ *  Requerimiento: 2018-34
+ *
+ *  Descripción: Clase que permite crear un objeto persistencia
+ */
+package com.acap.gcom.singleton;
+
+import com.acap.gcom.constantes.Constantes;
+import java.lang.invoke.MethodHandles;
+import java.util.Objects;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * Esta clase permite crear una persistencia para accesar a la basde de datos en todo el proyecto
+ */
+public class PersistenceManager {
+
+    private final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); // Variable utilizada para imprimir mensajes en la consola del servidor
+    private static final PersistenceManager SINGLETON = new PersistenceManager(); // Objeto persistencia
+    protected EntityManagerFactory emf;
+
+    public static PersistenceManager getInstance() {
+        return SINGLETON;
+    }
+
+    private PersistenceManager() {
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        if (Objects.isNull(emf)) {
+            createEntityManagerFactory();
+        }
+        return emf;
+    }
+
+    public void closeEntityManagerFactory() {
+
+        if (Objects.nonNull(emf)) {
+            emf.close();
+            emf = null;
+            log.info("Persistencia terminada", new java.util.Date());
+        }
+    }
+
+    protected void createEntityManagerFactory() {
+
+        this.emf = Persistence.createEntityManagerFactory(Constantes.PU);
+        log.info("Persistencia iniciada", new java.util.Date());
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            this.closeEntityManagerFactory();
+        } finally {
+            super.finalize();
+        }
+    }
+}
