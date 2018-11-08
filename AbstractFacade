@@ -1,12 +1,3 @@
-/*
- *  Nombre del archivo: AbstractFacade.java
- *  Fecha creación: 02/03/2018
- *  Analista Desarrollador: Yonaides Tavares- acap2033
- *  Requerimiento: 2018-34
- *
- *  Descripción: Clase utilizada para manejar las diferentes acciones CRUD de las entidades
- */
-package com.acap.gcom.DAO;
 
 import com.acap.gcom.singleton.PersistenceManager;
 import java.lang.invoke.MethodHandles;
