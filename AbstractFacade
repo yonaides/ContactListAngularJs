@@ -1,0 +1,535 @@
+/*
+ *  Nombre del archivo: AbstractFacade.java
+ *  Fecha creación: 02/03/2018
+ *  Analista Desarrollador: Yonaides Tavares- acap2033
+ *  Requerimiento: 2018-34
+ *
+ *  Descripción: Clase utilizada para manejar las diferentes acciones CRUD de las entidades
+ */
+package com.acap.gcom.DAO;
+
+import com.acap.gcom.singleton.PersistenceManager;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.validation.ConstraintViolationException;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Esta clase fue creada para manejar los procesos de insertar, consultar,
+ * salvar/editar y borrar de las entidades de la base de datos
+ *
+ * @param <T> clase entidad que será manejada.
+ */
+public abstract class AbstractFacade<T> {
+
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()); // log para manejar excepciones en el servidor
+    private Class<T> entityClass; // clase entidad usada en toda la clase
+    private EntityManagerFactory entityManagerFactory = PersistenceManager.getInstance().getEntityManagerFactory(); // clase que crea el entityManager 
+
+    public AbstractFacade(Class<T> entityClass) {
+        this.entityClass = entityClass;
+    }
+
+    /**
+     * Método que busca por la columna y valor especificado realizando una
+     * consulta a la base de datos
+     *
+     * @param column nombre de la columna
+     * @param value valor de tipo string
+     * @return retorna una lista de registros cuando es exitosa de lo contrario
+     * una lista vacia.
+     */
+    public List<T> buscarDatosPorColumnayValor(String column, String value) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<T> cq = cb.createQuery(entityClass);
+            Root<T> root = cq.from(entityClass);
+
+            cq.select(root).where(cb.equal(root.get(column), value));
+            TypedQuery<T> result = em.createQuery(cq);
+            return result.getResultList();
+
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Método que busca por la columna y valor especificado realizando una
+     * consulta a la base de datos
+     *
+     * @param column nombre de la columna
+     * @param value valor de tipo string
+     * @return retorna un registro cuando es exitosa de lo contrario retorna
+     * null.
+     */
+    public T buscarEntidadPorColumnayValor(String column, String value) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<T> cq = cb.createQuery(entityClass);
+            Root<T> root = cq.from(entityClass);
+
+            cq.select(root).where(cb.equal(root.get(column), value));
+            TypedQuery<T> result = em.createQuery(cq);
+            return result.getSingleResult();
+
+        } catch (NoResultException e) {
+            log.error("Error al realizar la consulta", e);
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Método que busca por la columna y valor especificado realizando una
+     * consulta a la base de datos
+     *
+     * @param column nombre de la columna
+     * @param value valor de tipo Integer
+     * @return retorna una lista de registros cuando es exitosa de lo contrario
+     * retorna una lista vacia.
+     */
+    public List<T> buscarDatosPorColumnayValor(String column, Integer value) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        try {
+
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<T> q = cb.createQuery(entityClass);
+            Root<T> root = q.from(entityClass);
+
+            q.select(root).where(cb.equal(root.get(column), value));
+            TypedQuery<T> result = em.createQuery(q);
+
+            List<T> rest = result.getResultList();
+
+            if (Objects.isNull(rest) || rest.isEmpty()) {
+                log.info("No hay datos en la busqueda ");
+                return new ArrayList();
+            }
+            return rest;
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Método que busca por la columna y valor especificado realizando una
+     * consulta a la base de datos
+     *
+     * @param column nombre de la columna
+     * @param value valor de tipo Object
+     * @return retorna una lista de registros cuando es exitosa de lo contrario
+     * retorna una lista vacia.
+     */
+    public List<T> buscarDatosPorColumnayValor(String column, Object value) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<T> q = cb.createQuery(entityClass);
+            Root<T> root = q.from(entityClass);
+
+            q.select(root).where(cb.equal(root.get(column), value));
+            TypedQuery<T> result = em.createQuery(q);
+
+            List<T> rest = result.getResultList();
+            if (Objects.isNull(rest) || rest.isEmpty()) {
+                log.info("No hay datos en la busqueda ");
+                return new ArrayList();
+            }
+            return rest;
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta ", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Método que permite realizar una busqueda utilizando criteria query y
+     * Parámetros retorna un listado de la entidad correspondiente
+     *
+     * @param parameters
+     * @return retorna una lista de registros de ser exitosa de lo contrario
+     * retorna una lista vacia
+     */
+    public List<T> construirCriterioDeBusquedaConParámetros(Map<String, Object> parameters) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+
+            Set<Map.Entry<String, Object>> rawParameters = parameters.entrySet();
+
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(entityClass);
+            Root<T> r = criteriaQuery.from(entityClass);
+
+            Predicate predicate = criteriaBuilder.conjunction();
+            for (Map.Entry<String, Object> param : rawParameters) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(r.get(param.getKey()), param.getValue()));
+            }
+
+            criteriaQuery.where(predicate);
+            Query query = em.createQuery(criteriaQuery);
+
+            return query.getResultList();
+
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta de criterios", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Este Método usa el nombre de Query Named ya creado en la entidad para
+     * hacer una consulta en la base de datos
+     *
+     * @param sql representa la consulta en formato string
+     * @return retorna una lista de registro en caso contrario una lista vacia
+     */
+    public List<T> buscarPorNombreConsulta(String sql) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            Query query = em.createNamedQuery(sql, entityClass);
+            return query.getResultList();
+
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Este Método usa el nombre de Query Named ya creado en la entidad para
+     * devolver una lista de registros
+     *
+     * @param nameQuery nombre de la consulta creada en la entidad
+     * @param parameters Parámetros con los cuales voy a filtrar
+     * @return retorn una lista de registros de ser satisfactoria la consulta en
+     * caso de error una lista vacia
+     */
+    public List<T> buscarPorNombreConsultaYParámetros(String nameQuery, Map<String, Object> parameters) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        try {
+
+            Set<Map.Entry<String, Object>> rawParameters = parameters.entrySet();
+            Query query = em.createNamedQuery(nameQuery, entityClass);
+
+            for (Map.Entry<String, Object> entry : rawParameters) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+
+            return query.getResultList();
+
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta con Parámetros", e);
+            return new ArrayList();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Este Método usa el nombre de Query Named ya creado en la entidad para
+     * devolver una entidad
+     *
+     * @param namedQuery nombre de la consulta creada en la entidad
+     * @param parameters Parámetros usados para filtrar en la consulta
+     * @return retorna una lista de registros en caso de ser satisfactoria en
+     * caso de error retorna una entidad vacia
+     */
+    public T buscarEntidadPorNombreDeConsultaYParámetros(String namedQuery, Map<String, Object> parameters) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        T entidad = null;
+
+        try {
+
+            Set<Map.Entry<String, Object>> rawParameters = parameters.entrySet();
+            Query query = em.createNamedQuery(namedQuery, entityClass);
+
+            for (Map.Entry<String, Object> entry : rawParameters) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+
+            return (T) query.getSingleResult();
+
+        } catch (NoResultException e) {
+            log.error("Error al realizar la criteria builder", e);
+            return entidad;
+        } finally {
+            em.close();
+        }
+
+    }
+
+    /**
+     * Método que guarda la entidad, utiliza como Parámetro la entidad
+     *
+     * @param entity la entidad a salvar
+     * @return returna la entidad ya salvada en caso de error, lanza una
+     * excepción en la consulta del servidor y la entidad se devuelve null
+     */
+    public T guardar(T entity) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            EntityTransaction t = em.getTransaction();
+            try {
+                t.begin();
+                em.persist(entity);
+                em.flush();
+                t.commit();
+            } catch (ConstraintViolationException e) {
+                log.error(" Error al realizar la transaccion ", e);
+                e.getConstraintViolations().forEach(err -> {
+                    log.error(String.format("%10s | %100s | error %10s%n", err.getPropertyPath(), err.getMessage(), err.getInvalidValue()));
+                });
+                entity = null;
+                if (t.isActive()) {
+                    t.rollback();
+                }
+            } catch (Exception e) {
+                log.error(" Error al realizar la transaccion ", e);
+                if (t.isActive()) {
+                    t.rollback();
+                }
+                entity = null;
+            }
+        } finally {
+            em.close();
+        }
+        return entity;
+
+    }
+
+    /**
+     * Método que edita una entidad utiliza como Parámetro al entidad a editar
+     *
+     * @param entity entidad usada para ser editada
+     * @return retorna la entidad ya editada
+     */
+    public T editar(T entity) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            EntityTransaction t = em.getTransaction();
+            try {
+                t.begin();
+                em.merge(entity);
+                em.flush();
+                t.commit();
+            } catch (ConstraintViolationException e) {
+                log.error(" Error al realizar la transaccion ", e);
+                e.getConstraintViolations().forEach(err -> {
+                    log.error(String.format("%10s | %100s | error %10s%n", err.getPropertyPath(), err.getMessage(), err.getInvalidValue()));
+                });
+                if (t.isActive()) {
+                    t.rollback();
+                }
+                entity = null;
+            } catch (Exception ex) {
+                log.error(" Error al realizar la transaccion ", ex);
+                if (t.isActive()) {
+                    t.rollback();
+                }
+                entity = null;
+            }
+        } finally {
+            em.close();
+        }
+
+        return entity;
+
+    }
+
+    /**
+     * Método que borra una entidad via el id, recibe como Parámetro el id del
+     * objeto el cual es la clave primera, este Método no retorna nada
+     *
+     * @param id, es el id o clave primeria de la entidad
+     */
+    public void borrar(Object id) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            EntityTransaction t = em.getTransaction();
+            try {
+                t.begin();
+                Object ref = em.getReference(entityClass, id);
+                em.remove(ref);
+                t.commit();
+            } catch (ConstraintViolationException e) {
+                log.error(" Error al realizar la transaccion ", e);
+                e.getConstraintViolations().forEach(err -> log.error(err.toString()));
+                if (t.isActive()) {
+                    t.rollback();
+                }
+            } catch (Exception e) {
+                log.error(" Error al realizar la transaccion ", e);
+                if (t.isActive()) {
+                    t.rollback();
+                }
+            }
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Método que busca una entidad via el id de la misma
+     *
+     * @param id
+     * @return retorna la entidad en caso de error se arroja una excepción en el
+     * log del servidor
+     */
+    public T buscar(Object id) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        T obj = null;
+        try {
+            obj = em.find(entityClass, id);
+        } catch (Exception e) {
+            log.error(" Error al realizar la consulta ", e);
+        } finally {
+            em.close();
+        }
+
+        return obj;
+    }
+
+    /**
+     * Método que busca via Simple Query Named una entidad utilizando los
+     * Parámetros como filtro y el Query Named creado en la entidad
+     *
+     * @param namedQuery nombre del Query Named creado en la entidad
+     * @param parameters Parámetros con los cuales voy a filtrar
+     * @return retorna una entidad en caso de ser satisfactoria en caso de error
+     * arroja una excepcion en el servidor
+     */
+    public T buscarConSimpleNombreConsulta(String namedQuery, Map<String, Object> parameters) {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        T result = null;
+
+        try {
+            Set<Map.Entry<String, Object>> rawParameters = parameters.entrySet();
+            Query query = em.createNamedQuery(namedQuery);
+            for (Map.Entry<String, Object> entry : rawParameters) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+            result = (T) query.getSingleResult();
+        } catch (NoResultException e) {
+            log.error("Error al realizar la consulta ", e);
+        } finally {
+            em.close();
+        }
+
+        return result;
+    }
+
+    /**
+     * Método que busca todos los registros de la entidad correspondiente este
+     * Método no recibe Parámetros
+     *
+     * @return retorna un listado de registros en caso de error arroja una
+     * excepción en el servidor
+     */
+    public List<T> buscarTodos() {
+
+        EntityManager em = entityManagerFactory.createEntityManager();
+        List<T> lista = new ArrayList();
+        try {
+            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            cq.select(cq.from(entityClass));
+            lista = em.createQuery(cq).getResultList();
+
+        } catch (Exception e) {
+            log.error("Error al realizar la consulta ", e);
+        } finally {
+            em.close();
+        }
+
+        return lista;
+    }
+
+    /**
+     * Método creado para realizar consultas en la base de datos, utilizando
+     * como Parámetros el SQL y los Parámetros sqlQuery SQL de tipo String
+     * parameters indica cuales son las Parámetros a filtrar
+     *
+     * @param sqlQuery
+     * @param parameters
+     * @return
+     */
+    public int executeSQLQueryNative(String sqlQuery, Map<String, Object> parameters) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        EntityTransaction t = em.getTransaction();
+        int update = 0;
+
+        try {
+
+            Query q = em.createNativeQuery(sqlQuery);
+            if (Objects.nonNull(parameters)) {
+                parameters.forEach(q::setParameter);
+            }
+
+            t.begin();
+            update = q.executeUpdate();
+            log.info("cantidad de registros actualizados ", update);
+        } catch (Exception e) {
+            log.error("Error al realizar el update", e);
+            t.rollback();
+        } finally {
+            em.close();
+        }
+        return update;
+
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
+    }
+
+}
